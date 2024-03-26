@@ -133,10 +133,10 @@ class EmitCModel final : public EmitCFunc {
 
         {
             puts("using PortType = std::variant< \n"
-                "   CData*,\n"
-                "   SData*,\n"
-                "   QData*,\n"
-                "   IData*,\n"
+                "   CData*"
+                ",\n   SData*"
+                ",\n   QData*"
+                ",\n   IData*"
             );
 
 
@@ -146,7 +146,7 @@ class EmitCModel final : public EmitCFunc {
                 std::string cache_str{}, val{};
                 for (const AstNode* nodep = modp->stmtsp(); nodep; nodep = nodep->nextp()) {
                     val = cvtToStr(nodep->widthWords());
-                    cache_str = "   VlWide<" + val + "> *,\n";
+                    cache_str = ",\n   VlWide<" + val + ">*";
                     if(cached.find(cache_str) != cached.end()) { continue; }
                     if (const AstVar* const varp = VN_CAST(nodep, Var)) {
                         if (nodep->isWide()) {
@@ -158,9 +158,7 @@ class EmitCModel final : public EmitCFunc {
                 }
             }
 
-            puts("   std::monostate\n"
-                ">;\n"
-            );
+            puts("\n>;\n\n");
 
             auto vlwide_end = vlwide_counts.end();
             for(auto vlwide_itr = vlwide_counts.begin(); vlwide_itr != vlwide_end; ++vlwide_itr) {
@@ -210,11 +208,8 @@ class EmitCModel final : public EmitCFunc {
         }
 
         puts("\n"
-           "using function_t = std::function<PortType(SelfType&)>; \n"
-           "using map_t = std::map<std::string, std::pair<bool, function_t> >; \n"
-           "static map_t init_reflect_values() { \n"
-           "   map_t ret{}; \n"
-           "   std::vector< std::pair<std::string, std::pair<bool, function_t> > > values = { \n"
+           "using map_t = std::map<std::string, std::pair<bool, PortType> >; \n"
+           "const map_t reflect_values = { \n"
         );
 
         // get func
@@ -228,10 +223,6 @@ class EmitCModel final : public EmitCFunc {
 
         puts("\n"
              "   }; \n"
-             "   for(auto v : values) { ret.insert(v); } \n"
-             "   return ret; \n"
-             "} \n"
-             "static inline map_t reflect_values = init_reflect_values();\n"
         );
 
 

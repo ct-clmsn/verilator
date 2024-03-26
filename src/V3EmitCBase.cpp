@@ -146,7 +146,7 @@ void EmitCBaseVisitorConst::emitVarDeclReflectLUTEntries(const AstVar* nodep, bo
    std::string name{};
    name = nodep->nameProtect();
    const std::string is_input = (name.find("in") == std::string::npos) ? "false" : "true";
-   puts("std::make_pair<std::string, std::pair<bool, function_t> >(std::string{\"" + name + "\"}, std::pair<bool, function_t>(" + is_input + ", [](SelfType & self) { return self.get_" + name + "(); })),\n");
+   puts("std::make_pair<std::string, std::pair<bool, PortType> >(std::string{\"" + name + "\"}, std::pair<bool, PortType>(" + is_input + ", &"+name+")),\n");
 }
 
 void EmitCBaseVisitorConst::emitVarDecl(const AstVar* nodep, bool asRef) {
